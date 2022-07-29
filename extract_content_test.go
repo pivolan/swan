@@ -23,17 +23,16 @@ func TestFromHTML1(t *testing.T) {
     <li>Dies ist der zweite Punkt</li>
     <li>Dies ist der dritte Punkt</li>
     <li>Dies ist der vierte Punkt</li>
-</ol> 
+</ol>
 
-<p>Es folgt eine unnummerierte Liste:</p>
+Es folgt eine unnummerierte Liste:
 <ul>
     <li>Erster Punkt</li>
     <li>Zweiter Punkt</li>
     <li>Dritter Punkt</li>
     <li>Vierter Punkt</li>
-</ul> 
-<p>
-Es folgt ein Infokasten: Weitere Informationen zum Thema Infobox Text macht keinen Sinn, ist aber spannend zu hören. 
+</ul>
+Es folgt ein Infokasten: Weitere Informationen zum Thema Infobox Text macht keinen Sinn, ist aber spannend zu hören.
 Es folgt ein Zitatkasten: Ringdingdingding Ringdingdingding so Fuchs (Tier des Waldes) Es folgt ein redaktioneller Kommentar: Es folgt Facebook-Post per oEmbed: Es folgt ein Twitter-Post per oEmbed: Es folgt ein Instagram-Post per oEmbed: Es folgt ein youtube-Video per oEmbed: Es folgt ein IFrame: An dieser Stelle ist ein externer Inhalt eingebunden. Es folgt eine HTML-Box: An dieser Stelle ist ein externer Inhalt eingebunden. Dies ist das Ende des Textes
 </p>`))
 	fmt.Println("CLEANED TEXT: ", a.CleanedText, e)

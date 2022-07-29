@@ -2,6 +2,7 @@ package swan
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -20,7 +21,7 @@ var (
 	pTags                   = cascadia.MustCompile("p")
 	replaceWithContentsTags = cascadia.MustCompile("a, b, strong, i, sup")
 	GoodContent             = cascadia.MustCompile("object, embed, img")
-	WhitelistTags           = cascadia.MustCompile("li, dt, dd")
+	WhitelistTags           = cascadia.MustCompile("li, dt, dd, ol, ul")
 	LineBreakTags           = []atom.Atom{atom.Li, atom.Ul, atom.Ol, atom.Dl, atom.Dt, atom.Dd}
 
 	multiNewlines = []byte("\n\n\n")
@@ -47,19 +48,20 @@ func (e extractContent) run(a *Article) error {
 		if !nodeIs(s.Nodes[0], atom.P) {
 			cc := a.getCCache(s.Nodes[0])
 
-			if s.FindMatcher(WhitelistTags).Length() != 0 {
-				return false
-			}
-			return cc.highLinkDensity ||
+			remove := cc.highLinkDensity ||
 				e.noParasWithoutTable(s) ||
 				!e.isNodeScoreThreshMet(a, s)
+			if remove {
+				s.AfterSelection(s.FindMatcher(WhitelistTags))
+			}
+			return remove
 		}
 
 		return false
 	}).Remove()
-
 	e.dropNegativeScored(a)
 	e.dropTinyEls(a)
+	fmt.Println(a.TopNode.Html())
 	e.prepareHTMLOut(a)
 	e.prepareCleanedText(a)
 
@@ -221,6 +223,7 @@ func (e extractContent) dropTinyEls(a *Article) {
 	a.TopNode.Children().Each(func(i int, s *goquery.Selection) {
 		cc := a.getCCache(s.Nodes[0])
 		remove := s.HasMatcher(GoodContent).Length() == 0 &&
+			!s.IsMatcher(WhitelistTags) &&
 			((cc.stopwords < 3 || cc.highLinkDensity) ||
 				(strings.HasPrefix(cc.text, "(") &&
 					strings.HasSuffix(cc.text, ")")))
