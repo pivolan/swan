@@ -19,7 +19,9 @@ var (
 	bodyTag                 = cascadia.MustCompile("body")
 	pTags                   = cascadia.MustCompile("p")
 	replaceWithContentsTags = cascadia.MustCompile("a, b, strong, i, sup")
-	goodContent             = cascadia.MustCompile("object, embed, img")
+	GoodContent             = cascadia.MustCompile("object, embed, img")
+	WhitelistTags           = cascadia.MustCompile("li, p.kolya")
+	LineBreakTags           = []atom.Atom{atom.Li, atom.Ul, atom.Ol}
 
 	multiNewlines = []byte("\n\n\n")
 	dblNewlines   = []byte("\n\n")
@@ -44,6 +46,10 @@ func (e extractContent) run(a *Article) error {
 
 		if !nodeIs(s.Nodes[0], atom.P) {
 			cc := a.getCCache(s.Nodes[0])
+
+			if s.FindMatcher(WhitelistTags).Length() != 0 {
+				return false
+			}
 			return cc.highLinkDensity ||
 				e.noParasWithoutTable(s) ||
 				!e.isNodeScoreThreshMet(a, s)
@@ -100,7 +106,7 @@ func (e extractContent) prepareCleanedText(a *Article) {
 
 		case n.Type == html.ElementNode:
 			switch n.DataAtom {
-			case atom.Br:
+			case atom.Br, atom.Li, atom.Ul, atom.Ol:
 				buff.WriteRune('\n')
 			case atom.P:
 				buff.WriteString("\n\n")
@@ -209,7 +215,7 @@ func (e extractContent) isNodeScoreThreshMet(a *Article, s *goquery.Selection) b
 func (e extractContent) dropTinyEls(a *Article) {
 	a.TopNode.Children().Each(func(i int, s *goquery.Selection) {
 		cc := a.getCCache(s.Nodes[0])
-		remove := s.HasMatcher(goodContent).Length() == 0 &&
+		remove := s.HasMatcher(GoodContent).Length() == 0 &&
 			((cc.stopwords < 3 || cc.highLinkDensity) ||
 				(strings.HasPrefix(cc.text, "(") &&
 					strings.HasSuffix(cc.text, ")")))
