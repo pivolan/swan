@@ -20,8 +20,8 @@ var (
 	pTags                   = cascadia.MustCompile("p")
 	replaceWithContentsTags = cascadia.MustCompile("a, b, strong, i, sup")
 	GoodContent             = cascadia.MustCompile("object, embed, img")
-	WhitelistTags           = cascadia.MustCompile("li, p.kolya")
-	LineBreakTags           = []atom.Atom{atom.Li, atom.Ul, atom.Ol}
+	WhitelistTags           = cascadia.MustCompile("li, dt, dd")
+	LineBreakTags           = []atom.Atom{atom.Li, atom.Ul, atom.Ol, atom.Dl, atom.Dt, atom.Dd}
 
 	multiNewlines = []byte("\n\n\n")
 	dblNewlines   = []byte("\n\n")
@@ -106,10 +106,15 @@ func (e extractContent) prepareCleanedText(a *Article) {
 
 		case n.Type == html.ElementNode:
 			switch n.DataAtom {
-			case atom.Br, atom.Li, atom.Ul, atom.Ol:
+			case atom.Br:
 				buff.WriteRune('\n')
 			case atom.P:
 				buff.WriteString("\n\n")
+			}
+			for _, tag := range LineBreakTags {
+				if n.DataAtom == tag {
+					buff.WriteRune('\n')
+				}
 			}
 			fallthrough
 
