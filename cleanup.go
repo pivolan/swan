@@ -101,6 +101,12 @@ var (
 		"iframe, link[rel=stylesheet]")
 	unwraps = cascadia.MustCompile("span[class~=dropcap]," +
 		"span[class~=drop_cap]," +
+		"h2, " +
+		"h3, " +
+		"h4," +
+		"ul, " +
+		"ol, " +
+		"li, " +
 		"p span")
 	keepTags = cascadia.MustCompile("a, blockquote, dl, div," +
 		"img, ol, p, pre, table, ul")

@@ -2,7 +2,6 @@ package swan
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -21,8 +20,8 @@ var (
 	pTags                   = cascadia.MustCompile("p")
 	replaceWithContentsTags = cascadia.MustCompile("a, b, strong, i, sup")
 	GoodContent             = cascadia.MustCompile("object, embed, img")
-	WhitelistTags           = cascadia.MustCompile("li, dt, dd, ol, ul")
-	LineBreakTags           = []atom.Atom{atom.Li, atom.Ul, atom.Ol, atom.Dl, atom.Dt, atom.Dd}
+	WhitelistTags           = cascadia.MustCompile("h2.bt-content")
+	LineBreakTags           = []atom.Atom{atom.H2}
 
 	multiNewlines = []byte("\n\n\n")
 	dblNewlines   = []byte("\n\n")
@@ -52,7 +51,11 @@ func (e extractContent) run(a *Article) error {
 				e.noParasWithoutTable(s) ||
 				!e.isNodeScoreThreshMet(a, s)
 			if remove {
-				s.AfterSelection(s.FindMatcher(WhitelistTags))
+				if s.IsMatcher(WhitelistTags) {
+					remove = false
+				} else {
+					s.AfterSelection(s.FindMatcher(WhitelistTags))
+				}
 			}
 			return remove
 		}
@@ -61,7 +64,6 @@ func (e extractContent) run(a *Article) error {
 	}).Remove()
 	e.dropNegativeScored(a)
 	e.dropTinyEls(a)
-	fmt.Println(a.TopNode.Html())
 	e.prepareHTMLOut(a)
 	e.prepareCleanedText(a)
 
@@ -199,7 +201,7 @@ func (e extractContent) getSiblingBaseScore(a *Article) uint {
 
 func (e extractContent) noParasWithoutTable(s *goquery.Selection) bool {
 	s.FindMatcher(pTags).Each(func(i int, s *goquery.Selection) {
-		if len(s.Text()) < 25 {
+		if len(s.Text()) < 50 {
 			s.Remove()
 		}
 	})

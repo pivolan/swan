@@ -13,7 +13,7 @@ import (
 func main() {
 	out := bytes.NewBufferString("package swan\n\nvar(stopwords = map[string]map[string]bool{\n")
 
-	files, err := filepath.Glob("python-goose/goose/resources/text/stopwords*")
+	files, err := filepath.Glob("goose3/goose3/resources/text/stopwords*")
 	if err != nil {
 		log.Fatalf("Could not glob for stopwords: %s", err)
 	}
