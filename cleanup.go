@@ -265,7 +265,9 @@ func (c cleanup) run(a *Article) error {
 		RemoveAttr("name")
 
 	for _, cs := range remove {
-		a.Doc.FindMatcher(cs).Remove()
+		if !a.Doc.FindMatcher(cs).IsMatcher(WhitelistTags) {
+			a.Doc.FindMatcher(cs).Remove()
+		}
 	}
 
 	a.Doc.FindMatcher(unwraps).Contents().Unwrap()
