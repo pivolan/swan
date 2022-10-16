@@ -99,7 +99,7 @@ var (
 	safeTags    = cascadia.MustCompile("body, article")
 	uselessTags = cascadia.MustCompile("script, noscript, style, " +
 		"iframe, link[rel=stylesheet]")
-	unwraps = cascadia.MustCompile("span[class~=dropcap]," +
+	Unwraps = cascadia.MustCompile("span[class~=dropcap]," +
 		"span[class~=drop_cap]," +
 		"h2, " +
 		"h3, " +
@@ -270,7 +270,7 @@ func (c cleanup) run(a *Article) error {
 		}
 	}
 
-	a.Doc.FindMatcher(unwraps).Contents().Unwrap()
+	a.Doc.FindMatcher(Unwraps).Contents().Unwrap()
 
 	ems := a.Doc.FindMatcher(emTags)
 	ems.NotSelection(ems.HasMatcher(imgTags)).Children().Unwrap()
